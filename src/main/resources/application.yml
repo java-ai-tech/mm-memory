@@ -1,0 +1,59 @@
+# Artisan Memory Configuration Example
+spring:
+  # Spring Data Redis Configuration
+  ai:
+    deepseek:
+      api-key: ${DEEPSEEK_API_KEY:}
+      base-url: https://api.deepseek.com
+      completions-path: /v1/chat/completions
+      options:
+        model: deepseek-chat
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      password: # Optional: Set if Redis requires authentication
+      timeout: 120000ms  # 增加到60秒，支持阻塞命令
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+        shutdown-timeout: 100ms
+
+    # Spring Data MongoDB Configuration
+    mongodb:
+      uri: mongodb://localhost:27017
+      database: artisan_memory
+
+# Memory Specific Configuration
+artisan:
+  memory:
+    storage:
+      key-prefix: "session:"
+    working-memory:
+      head-size: 1                                    # Head 区域最大轮数
+      tail-size: 2                                    # Tail 区域最大轮数
+      timing-context-window-max-size: 5              # timingContextWindow 最大消息数
+      timing-context-window-token-threshold: 5000    # timingContextWindow Token 阈值
+      current-round-token-threshold: 2000            # 当前轮次摘要触发阈值（token数）
+    session:
+      cleanup-interval-minutes: 10
+      max-inactive-minutes: 60
+    # 压缩策略配置
+    compression:
+      auto-compression: true
+      strategies:
+        - CURRENT_ROUND_SUMMARIZATION  # 当前轮次压缩
+        - HISTORY_SUMMARIZATION      # 历史摘要压缩
+        - PIN_AGGREGATION            # Pin 聚合压缩
+        - PIN_JUDGMENT               # Pin 判断策略
+        #- TOOL_CALL_COMPRESSION      # 工具调用压缩
+# Logging configuration
+logging:
+  level:
+    com.iflytek.artisan.memory: DEBUG
+    org.springframework.data.redis: INFO
+    org.springframework.data.mongodb: INFO

@@ -1,0 +1,21 @@
+package com.iflytek.artisan.memory.config;
+
+import org.springframework.context.annotation.Conditional;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * Condition annotation to check if a compression strategy is enabled.
+ */
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Conditional(StrategyEnabledCondition.class)
+public @interface ConditionalOnStrategyEnabled {
+    /**
+     * The strategy name to check (e.g., "PIN_JUDGMENT").
+     */
+    String value();
+}
